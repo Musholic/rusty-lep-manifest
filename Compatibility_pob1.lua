@@ -7,5 +7,6 @@ compat["2.58.1"] = "0.2.6"
 compat["2.59.0"] = "0.2.6"
 compat["2.59.1"] = "0.2.6"
 compat["2.59.2"] = "0.2.6"
+compat["2.59.2-c7cef2b4"] = "0.2.9"
 
 return compat
