@@ -1,5 +1,5 @@
 #@
--- Path of Building
+-- Last Epoch Planner
 --
 -- Module: Update Check
 -- Checks for updates
@@ -98,7 +98,7 @@ local scriptPath, scriptFallback = GetScriptPath()
 scriptPath = scriptPath or scriptFallback or "."
 
 
-local rustyRepo = "https://raw.githubusercontent.com/meehl/rusty-pob-manifest/main/"
+local rustyRepo = "https://raw.githubusercontent.com/Musholic/rusty-lep-manifest/main/"
 
 -- Load and process local manifest
 local localVer
@@ -106,7 +106,7 @@ local localPlatform, localBranch
 local localFiles = { }
 local localManXML = xml.LoadXMLFile(scriptPath.."/manifest.xml")
 local localSource
-if localManXML and localManXML[1].elem == "PoBVersion" then
+if localManXML and localManXML[1].elem == "LEPVersion" then
 	for _, node in ipairs(localManXML[1]) do
 		if type(node) == "table" then
 			if node.elem == "Version" then
@@ -152,7 +152,7 @@ if not remoteManText then
 	return nil, "Couldn't download version manifest.\nReason: "..errMsg.."\nCheck your internet connectivity.\nIf you are using a proxy, specify it in Options."
 end
 local remoteManXML = xml.ParseXML(remoteManText)
-if remoteManXML and remoteManXML[1].elem == "PoBVersion" then
+if remoteManXML and remoteManXML[1].elem == "LEPVersion" then
 	for _, node in ipairs(remoteManXML[1]) do
 		if type(node) == "table" then
 			if node.elem == "Version" then
@@ -229,39 +229,39 @@ local function isVersionCompatible(version1, version2)
     return false
 end
 
--- Check if remote PoB version is compatible with Rusty Path of Building 
-local rustyPobVersionFile = io.open(scriptPath.."/rpob.version", "r")
-if rustyPobVersionFile then
-	local rustyPobVersion = rustyPobVersionFile:read("a")
+-- Check if remote LEP version is compatible with Rusty Path of Building
+local rustyLepVersionFile = io.open(scriptPath.."/rlep.version", "r")
+if rustyLepVersionFile then
+	local rustyLepVersion = rustyLepVersionFile:read("a")
 
-	local compatFile = "Compatibility_pob" .. gameVersion .. ".lua"
+	local compatFile = "Compatibility_lep.lua"
 	local compatText, errMsg = downloadFileText(rustyRepo, compatFile)
 	if not compatText then
 		ConPrintf("Update check failed: couldn't download version compatibility info")
 		return nil, "Couldn't download version compatibility info.\nReason: "..errMsg.."\nCheck your internet connectivity.\nIf you are using a proxy, specify it in Options."
 	else
 		local compatTable = loadstring(compatText)()
-		local minRequiredRustyPobVersion = compatTable[remoteVer]
+		local minRequiredRustyLepVersion = compatTable[remoteVer]
 
-		if minRequiredRustyPobVersion == nil then
+		if minRequiredRustyLepVersion == nil then
 				ConPrintf("No compatibility info found")
 				return "none"
 		end
 
-		local compatResult, errMsg = isVersionCompatible(rustyPobVersion, minRequiredRustyPobVersion)
+		local compatResult, errMsg = isVersionCompatible(rustyLepVersion, minRequiredRustyLepVersion)
 		if compatResult == nil then
 				ConPrintf("Update check failed: Invalid version format")
 				return nil, errMsg
 		else
 				if not compatResult then
-						ConPrintf("New PoB update available but it is not supported by your current version of Rusty PoB")
-						return nil, "New update available but it is not supported\nby your current version of Rusty PoB.\nMinimum required version: "..minRequiredRustyPobVersion
+						ConPrintf("New LEP update available but it is not supported by your current version of Rusty LEP")
+						return nil, "New update available but it is not supported\nby your current version of Rusty LEP.\nMinimum required version: "..minRequiredRustyLepVersion
 
 				end
 		end
 	end
 else
-	ConPrintf("Update check failed: RPoB Version file missing")
+	ConPrintf("Update check failed: RLEP Version file missing")
 	return nil, "Rusty Path of Building version file is missing."
 end
 
@@ -379,7 +379,7 @@ if failedFile then
 end
 
 -- Create new manifest
-localManXML = { elem = "PoBVersion" }
+localManXML = { elem = "LEPVersion" }
 table.insert(localManXML, { elem = "Version", attrib = { number = remoteVer, platform = localPlatform, branch = localBranch } })
 for part, platforms in pairs(remoteSources) do
 	for platform, url in pairs(platforms) do
@@ -397,7 +397,7 @@ local ops = { }
 for _, data in pairs(updateFiles) do
 	-- Ensure that the destination path of this file exists
 	local dirStr = ""
-	-- NOTE: Replaced '+' with '*'  ------v to support unix paths 
+	-- NOTE: Replaced '+' with '*'  ------v to support unix paths
 	for dir in data.fullPath:gmatch("([^/]*/)") do
 		dirStr = dirStr .. dir
 		MakeDir(dirStr)
