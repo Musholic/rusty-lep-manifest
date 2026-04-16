@@ -241,7 +241,8 @@ if rustyLepVersionFile then
 		return nil, "Couldn't download version compatibility info.\nReason: "..errMsg.."\nCheck your internet connectivity.\nIf you are using a proxy, specify it in Options."
 	else
 		local compatTable = loadstring(compatText)()
-		local minRequiredRustyLepVersion = compatTable[remoteVer]
+		-- For beta version, the version is suffixed with the commit hash so we need to strip it
+		local minRequiredRustyLepVersion = compatTable[remoteVer:gsub("-.*$", "")]
 
 		if minRequiredRustyLepVersion == nil then
 				ConPrintf("No compatibility info found")
